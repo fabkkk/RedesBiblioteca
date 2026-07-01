@@ -1,18 +1,102 @@
-1. A Estrutura Física e Lógica (Os Enlaces)
-A rede é construída conectando três tecnologias diferentes:
-- O Backbone (Point-to-Point): É a "espinha dorsal" da rede que interliga os sistemas. Ele conecta o Roteador Central (Nó 0) diretamente ao Access Point do Wi-Fi (Nó 1). Foi configurado com uma banda alta (1Gbps) e um atraso mínimo (2ms) para garantir um trânsito rápido entre os dois mundos (cabeado e sem fio).
-- A Rede Cabeada Administrativa (CSMA): Simula uma rede local tradicional (Ethernet) operando a 100Mbps. O Roteador Central (Nó 0) faz parte desta rede, servindo de ponte. Nela também estão o Servidor de Acervo (Nó 2), o Servidor de Empréstimos (Nó 3) e os dois computadores do balcão de atendimento (Nós 4 e 5).
-- A Rede Sem Fio dos Alunos (Wi-Fi): O Nó 1 atua como a antena (Access Point) irradiando o SSID "UFPA-Biblioteca". Os Nós 6 a 11 representam os notebooks e smartphones dos alunos conectados a essa rede. Eles possuem um modelo de mobilidade estático (ConstantPositionMobilityModel), indicando que os alunos estão parados nas mesas de estudo.
+# README – Topologia e Funcionamento da Rede
 
-2. O Endereçamento e Roteamento
-Para que um aluno na rede Wi-Fi consiga solicitar um arquivo do Servidor de Acervo na rede cabeada, a topologia foi dividida em três sub-redes:
-- 10.1.1.0: Exclusiva para a comunicação direta no cabo Point-to-Point entre o Roteador Central e o Access Point.
-- 10.1.2.0: Endereça as máquinas administrativas e os servidores (CSMA).
-- 10.1.3.0: Distribui IPs para os dispositivos dos alunos no Wi-Fi.
+## 1. Estrutura Física e Lógica da Rede
 
-O comando Ipv4GlobalRoutingHelper::PopulateRoutingTables () cria magicamente as tabelas de roteamento em todos os nós. Ele ensina ao Access Point como enviar pacotes do IP 10.1.3.X para a rede 10.1.2.X. 
+A rede é construída utilizando três tecnologias diferentes de enlace.
 
-3. O Modelo de Tráfego
-A simulação comprova o funcionamento da rede executando dois tipos de transferência de dados:  
-- CBR sobre UDP (Sistema de Empréstimos): Um dos computadores do balcão (Nó 4) envia um fluxo de pacotes com tamanho fixo (1024 bytes) a cada 0.1 segundos para o Servidor de Empréstimos (Nó 3). Isso simula o tráfego CBR (Constant Bit Rate), funcionando como um ping ou "batimento cardíaco" constante para manter a sessão do sistema da biblioteca ativa. Usa UDP porque é rápido e perdas esporádicas não derrubam a aplicação.
-- FTP sobre TCP (Download de PDFs): O Servidor de Acervo (Nó 2) inicia o envio de um arquivo virtualmente infinito (configurado com MaxBytes igual a 0 na aplicação BulkSend) para o dispositivo de um aluno no Wi-Fi (Nó 6). O protocolo TCP entra em ação para garantir que nenhum pacote se perca no ar, ativando mecanismos de controle de congestionamento.
+### Backbone (Point-to-Point)
+
+É a espinha dorsal da rede, responsável por interligar os dois principais segmentos da infraestrutura.
+
+- Conecta o **Roteador Central (Nó 0)** diretamente ao **Access Point (Nó 1)**.
+- Banda configurada: **1 Gbps**.
+- Atraso (Delay): **2 ms**.
+
+Essa configuração garante uma comunicação rápida entre a rede cabeada e a rede sem fio.
+
+### Rede Cabeada Administrativa (CSMA)
+
+Simula uma rede Ethernet tradicional operando a **100 Mbps**.
+
+Nela estão conectados:
+
+- **Nó 0** – Roteador Central
+- **Nó 2** – Servidor de Acervo
+- **Nó 3** – Servidor de Empréstimos
+- **Nó 4** – Computador do Balcão 1
+- **Nó 5** – Computador do Balcão 2
+
+O Roteador Central atua como ponte entre a rede administrativa e a rede sem fio.
+
+### Rede Sem Fio dos Alunos (Wi-Fi)
+
+O **Nó 1** atua como Access Point, transmitindo o SSID **"UFPA-Biblioteca"**.
+
+Os dispositivos dos alunos são representados pelos:
+
+- **Nó 6**
+- **Nó 7**
+- **Nó 8**
+- **Nó 9**
+- **Nó 10**
+- **Nó 11**
+
+Todos utilizam o modelo de mobilidade **ConstantPositionMobilityModel**, representando alunos sentados em suas mesas de estudo durante toda a simulação.
+
+---
+
+## 2. Endereçamento IP e Roteamento
+
+Para permitir a comunicação entre os diferentes segmentos da rede, a topologia foi dividida em três sub-redes:
+
+- **10.1.1.0/24** – Comunicação Point-to-Point entre o Roteador Central e o Access Point.
+- **10.1.2.0/24** – Rede administrativa (CSMA), incluindo servidores e computadores do balcão.
+- **10.1.3.0/24** – Rede Wi-Fi utilizada pelos dispositivos dos alunos.
+
+O roteamento é configurado automaticamente através do comando:
+
+```cpp
+Ipv4GlobalRoutingHelper::PopulateRoutingTables();
+```
+
+Esse comando cria as tabelas de roteamento de todos os nós, permitindo, por exemplo, que um dispositivo da rede Wi-Fi (**10.1.3.X**) consiga acessar os servidores presentes na rede administrativa (**10.1.2.X**).
+
+---
+
+## 3. Modelo de Tráfego
+
+A simulação valida o funcionamento da rede utilizando dois tipos distintos de comunicação.
+
+### CBR sobre UDP (Sistema de Empréstimos)
+
+Um dos computadores do balcão (**Nó 4**) envia continuamente pacotes ao **Servidor de Empréstimos (Nó 3)**.
+
+**Características:**
+
+- **Protocolo:** UDP
+- **Tamanho do pacote:** 1024 bytes
+- **Intervalo entre pacotes:** 0,1 segundo
+
+Esse fluxo representa um tráfego **CBR (Constant Bit Rate)**, funcionando como um "batimento cardíaco" da aplicação para manter a sessão do sistema ativa.
+
+O protocolo **UDP** foi escolhido por apresentar baixa latência e tolerar perdas ocasionais de pacotes sem comprometer o funcionamento da aplicação.
+
+### FTP sobre TCP (Download de PDFs)
+
+O **Servidor de Acervo (Nó 2)** realiza o envio de um arquivo virtualmente infinito para um dispositivo de aluno (**Nó 6**).
+
+**Características:**
+
+- **Protocolo:** TCP
+- **Aplicação:** BulkSendApplication
+- **Configuração:** `MaxBytes = 0`
+
+Ao configurar `MaxBytes = 0`, a aplicação transmite dados continuamente durante toda a simulação.
+
+O protocolo **TCP** garante a entrega confiável dos dados por meio de mecanismos como:
+
+- Controle de congestionamento;
+- Retransmissão de pacotes perdidos;
+- Controle de fluxo.
+
+Esse cenário simula o download de arquivos PDF do acervo digital da biblioteca pelos alunos conectados à rede Wi-Fi.

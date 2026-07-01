@@ -6,9 +6,9 @@ A rede é construída conectando três tecnologias diferentes:
 
 2. O Endereçamento e Roteamento
 Para que um aluno na rede Wi-Fi consiga solicitar um arquivo do Servidor de Acervo na rede cabeada, a topologia foi dividida em três sub-redes:
-10.1.1.0: Exclusiva para a comunicação direta no cabo Point-to-Point entre o Roteador Central e o Access Point.
-10.1.2.0: Endereça as máquinas administrativas e os servidores (CSMA).
-10.1.3.0: Distribui IPs para os dispositivos dos alunos no Wi-Fi.
+- 10.1.1.0: Exclusiva para a comunicação direta no cabo Point-to-Point entre o Roteador Central e o Access Point.
+- 10.1.2.0: Endereça as máquinas administrativas e os servidores (CSMA).
+- 10.1.3.0: Distribui IPs para os dispositivos dos alunos no Wi-Fi.
 
 O comando Ipv4GlobalRoutingHelper::PopulateRoutingTables () cria magicamente as tabelas de roteamento em todos os nós. Ele ensina ao Access Point como enviar pacotes do IP 10.1.3.X para a rede 10.1.2.X. 
 

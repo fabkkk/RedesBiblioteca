@@ -93,7 +93,7 @@ int main (int argc, char *argv[]) {
     mobilityInfra.SetPositionAllocator (positionAlloc);
     mobilityInfra.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
     mobilityInfra.Install (csmaNodes); 
-    mobilityInfra.Install (wifiApNode); // AP agora tem posicao fixa garantida
+    mobilityInfra.Install (wifiApNode);
 
     // posicoes dos alunos
     MobilityHelper mobilityAlunos;
@@ -151,7 +151,7 @@ int main (int argc, char *argv[]) {
     udpClientApps.Stop (Seconds (10.0));
 
     // ==========================================
-    //            TRAFEFO FTP / TCP 
+    //            TRAFEGO FTP / TCP 
     // ==========================================
     
     uint16_t ftpPort = 50000;

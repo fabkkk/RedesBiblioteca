@@ -4,7 +4,7 @@ Este repositório contém o código-fonte e a documentação para a simulação 
 
 O projeto tem como objetivo principal analisar o comportamento do roteamento IP e a coexistência de tráfegos heterogêneos (TCP e UDP) em domínios de broadcast distintos, isolando as demandas administrativas das demandas acadêmicas.
 
-## Equipe
+## Equipe Desenvolvedora
 * **Fábio**
 * **Claudio**
 * **Luana**
@@ -46,3 +46,21 @@ Para compilar e executar esta simulação, você precisará do ambiente Linux pa
 
 ```bash
 ./ns3 run scratch/biblioteca_sim.cc
+```
+*(Substitua `biblioteca_sim.cc` pelo nome exato do arquivo `.cc` salvo na pasta `scratch`)*
+
+---
+
+## Métricas e Resultados
+
+Ao final dos 10 segundos de simulação, o script gerará automaticamente os seguintes arquivos no diretório de execução:
+
+* **`biblioteca-estatisticas.xml`**: Arquivo gerado pelo `FlowMonitor`, contendo dados detalhados sobre vazão (throughput), atraso (delay), jitter e perda de pacotes para cada fluxo (TCP e UDP).
+* **`biblioteca-animacao.xml`**: Arquivo de trace XML pronto para ser aberto no software **NetAnim**, permitindo a visualização gráfica da topologia, posicionamento dos nós e o trânsito interativo dos pacotes.
+* **Arquivos `.pcap`**: Traces de captura de rede prontos para análise profunda no **Wireshark**:
+  * `pcap-backbone-X-X.pcap`
+  * `pcap-lan-X-X.pcap` (Focado no tráfego CSMA)
+  * `pcap-wifi-X-X.pcap` (Focado no download acadêmico)
+
+---
+*Projeto desenvolvido para a disciplina de Redes de Computadores.*

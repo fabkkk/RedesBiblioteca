@@ -3,8 +3,8 @@
  * Disciplina: Rede de Computadores
  * Alunos: Fabio, Claudio e Luana
  * * Mini-Mundo e Trafego:
- * 1. FTP (TCP): Alunos baixando PDFs pesados do Acervo (BulkSend -> PacketSink)
- * 2. CBR (UDP): Balcao enviando telemetria unidirecional constante ao Servidor (OnOff -> PacketSink)
+ * FTP (TCP): Alunos baixando PDFs do Acervo (BulkSend -> PacketSink)
+ * CBR (UDP): Balcao enviando telemetria unidirecional constante ao Servidor (OnOff -> PacketSink)
  */
 
 #include "ns3/core-module.h"

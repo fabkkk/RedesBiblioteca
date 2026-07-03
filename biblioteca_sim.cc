@@ -74,7 +74,7 @@ int main (int argc, char *argv[]) {
     //          POSICIONAMENTO DOS NOS
     // ==========================================
     
-    // 1. Rede Cabeada (Roteador, Acervo, Emprestimos e Balcoes)
+    // rede cabeada (roteador, acervo, emprestimos e balcoes)
     MobilityHelper mobilityCsma;
     Ptr<ListPositionAllocator> posCsma = CreateObject<ListPositionAllocator> ();
     posCsma->Add (Vector (30.0, 20.0, 0.0)); // Roteador (Centro)
@@ -86,7 +86,7 @@ int main (int argc, char *argv[]) {
     mobilityCsma.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
     mobilityCsma.Install (csmaNodes); 
 
-    // 2. Access Point (Isolado na Direita)
+    // access point
     MobilityHelper mobilityAp;
     Ptr<ListPositionAllocator> posAp = CreateObject<ListPositionAllocator> ();
     posAp->Add (Vector (50.0, 20.0, 0.0)); // AP na mesma linha do Roteador
@@ -94,13 +94,13 @@ int main (int argc, char *argv[]) {
     mobilityAp.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
     mobilityAp.Install (wifiApNode);
 
-// 3. Alunos (Grade ao lado do AP)
+    // alunos
     MobilityHelper mobilityAlunos;
     mobilityAlunos.SetPositionAllocator ("ns3::GridPositionAllocator",
                                    "MinX", DoubleValue (65.0),
-                                   "MinY", DoubleValue (5.0),   // Subi um pouco para centralizar o bloco com o AP
-                                   "DeltaX", DoubleValue (18.0), // Afasta os alunos na horizontal (largura do texto)
-                                   "DeltaY", DoubleValue (10.0), // Afasta os alunos na vertical
+                                   "MinY", DoubleValue (5.0),
+                                   "DeltaX", DoubleValue (18.0),
+                                   "DeltaY", DoubleValue (10.0),
                                    "GridWidth", UintegerValue (2),
                                    "LayoutType", StringValue ("RowFirst"));
     mobilityAlunos.SetMobilityModel ("ns3::ConstantPositionMobilityModel");

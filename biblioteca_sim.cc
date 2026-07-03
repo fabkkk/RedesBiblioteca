@@ -1,10 +1,10 @@
 /*
- * Projeto: Simulacao de Rede da Biblioteca Central
+ * Projeto: Simulacao de Rede da Biblioteca Central     
  * Disciplina: Rede de Computadores
  * Alunos: Fabio, Claudio e Luana
  * * Mini-Mundo e Trafego:
- * FTP (TCP): Alunos baixando PDFs do Acervo (BulkSend -> PacketSink)
- * CBR (UDP): Balcao enviando telemetria unidirecional constante ao Servidor (OnOff -> PacketSink)
+ * 1. FTP (TCP): Alunos baixando PDFs pesados do Acervo (BulkSend -> PacketSink)
+ * 2. CBR (UDP): Balcao enviando telemetria unidirecional constante ao Servidor (OnOff -> PacketSink)
  */
 
 #include "ns3/core-module.h"
@@ -30,20 +30,14 @@ int main (int argc, char *argv[]) {
     // ==========================================
     
     NodeContainer p2pNodes;
-    p2pNodes.Create (2); // No 0 (Roteador Central), No 1 (Access Point)
+    p2pNodes.Create (2);
 
     NodeContainer csmaNodes;
     csmaNodes.Add (p2pNodes.Get (0)); 
-    // csmaNodes contera:
-    // Indice 0 -> No Global 0 (Roteador Central)
-    // Indice 1 -> No Global 2 (Servidor Acervo)
-    // Indice 2 -> No Global 3 (Servidor Emprestimos)
-    // Indice 3 -> No Global 4 (Balcao 1)
-    // Indice 4 -> No Global 5 (Balcao 2)
     csmaNodes.Create (4); 
 
     NodeContainer wifiStaNodes;
-    wifiStaNodes.Create (6); // Nos Globais 6 a 11 (Alunos no Wi-Fi)
+    wifiStaNodes.Create (6); 
     NodeContainer wifiApNode = p2pNodes.Get (1); 
 
     // ==========================================
@@ -80,29 +74,34 @@ int main (int argc, char *argv[]) {
     //          POSICIONAMENTO DOS NOS
     // ==========================================
     
-    // posicoes dos nos
-    MobilityHelper mobilityInfra;
-    Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-    positionAlloc->Add (Vector (20.0, 10.0, 0.0)); // No 0: Roteador Central
-    positionAlloc->Add (Vector (20.0, 20.0, 0.0)); // No 1: Access Point
-    positionAlloc->Add (Vector (10.0, 10.0, 0.0)); // No 2: Serv. Acervo
-    positionAlloc->Add (Vector (30.0, 10.0, 0.0)); // No 3: Serv. Emprestimos
-    positionAlloc->Add (Vector (10.0, 0.0, 0.0));  // No 4: Balcao 1
-    positionAlloc->Add (Vector (30.0, 0.0, 0.0));  // No 5: Balcao 2
-    
-    mobilityInfra.SetPositionAllocator (positionAlloc);
-    mobilityInfra.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
-    mobilityInfra.Install (csmaNodes); 
-    mobilityInfra.Install (wifiApNode);
+    // 1. Rede Cabeada (Roteador, Acervo, Emprestimos e Balcoes)
+    MobilityHelper mobilityCsma;
+    Ptr<ListPositionAllocator> posCsma = CreateObject<ListPositionAllocator> ();
+    posCsma->Add (Vector (30.0, 20.0, 0.0)); // Roteador (Centro)
+    posCsma->Add (Vector (10.0, 20.0, 0.0)); // Acervo (Esquerda)
+    posCsma->Add (Vector (30.0, 40.0, 0.0)); // Emprestimos (Abaixo do Roteador)
+    posCsma->Add (Vector (10.0, 40.0, 0.0)); // Balcao 1 (Abaixo e Esquerda)
+    posCsma->Add (Vector (50.0, 40.0, 0.0)); // Balcao 2 (Abaixo e Direita)
+    mobilityCsma.SetPositionAllocator (posCsma);
+    mobilityCsma.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+    mobilityCsma.Install (csmaNodes); 
 
-    // posicoes dos alunos
+    // 2. Access Point (Isolado na Direita)
+    MobilityHelper mobilityAp;
+    Ptr<ListPositionAllocator> posAp = CreateObject<ListPositionAllocator> ();
+    posAp->Add (Vector (50.0, 20.0, 0.0)); // AP na mesma linha do Roteador
+    mobilityAp.SetPositionAllocator (posAp);
+    mobilityAp.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+    mobilityAp.Install (wifiApNode);
+
+// 3. Alunos (Grade ao lado do AP)
     MobilityHelper mobilityAlunos;
     mobilityAlunos.SetPositionAllocator ("ns3::GridPositionAllocator",
-                                   "MinX", DoubleValue (15.0),
-                                   "MinY", DoubleValue (25.0),
-                                   "DeltaX", DoubleValue (5.0),
-                                   "DeltaY", DoubleValue (5.0),
-                                   "GridWidth", UintegerValue (3),
+                                   "MinX", DoubleValue (65.0),
+                                   "MinY", DoubleValue (5.0),   // Subi um pouco para centralizar o bloco com o AP
+                                   "DeltaX", DoubleValue (18.0), // Afasta os alunos na horizontal (largura do texto)
+                                   "DeltaY", DoubleValue (10.0), // Afasta os alunos na vertical
+                                   "GridWidth", UintegerValue (2),
                                    "LayoutType", StringValue ("RowFirst"));
     mobilityAlunos.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
     mobilityAlunos.Install (wifiStaNodes);
@@ -117,7 +116,6 @@ int main (int argc, char *argv[]) {
     stack.Install (wifiStaNodes);
 
     Ipv4AddressHelper address;
-
     address.SetBase ("10.1.1.0", "255.255.255.0");
     Ipv4InterfaceContainer p2pInterfaces = address.Assign (p2pDevices);
 
@@ -135,17 +133,14 @@ int main (int argc, char *argv[]) {
     // ==========================================
     
     uint16_t cbrPort = 9;
-    
-    // Servidor UDP
     Address localAddress (InetSocketAddress (Ipv4Address::GetAny (), cbrPort));
     PacketSinkHelper packetSinkHelperUdp ("ns3::UdpSocketFactory", localAddress);
     ApplicationContainer udpSinkApps = packetSinkHelperUdp.Install (csmaNodes.Get (2)); 
     udpSinkApps.Start (Seconds (1.0));
     udpSinkApps.Stop (Seconds (10.0));
 
-    // Cliente UDP
     OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (csmaInterfaces.GetAddress (2), cbrPort)));
-    onoff.SetConstantRate (DataRate ("80kbps"), 1024); // Simula 1 pacote de 1024 bytes a cada ~0.1s
+    onoff.SetConstantRate (DataRate ("80kbps"), 1024); 
     ApplicationContainer udpClientApps = onoff.Install (csmaNodes.Get (3));
     udpClientApps.Start (Seconds (2.0));
     udpClientApps.Stop (Seconds (10.0));
@@ -163,7 +158,7 @@ int main (int argc, char *argv[]) {
 
     BulkSendHelper bulkSend ("ns3::TcpSocketFactory", sinkAddress);
     bulkSend.SetAttribute ("MaxBytes", UintegerValue (0)); 
-    ApplicationContainer tcpSourceApps = bulkSend.Install (csmaNodes.Get (1)); // No Global 2 (Indice 1)
+    ApplicationContainer tcpSourceApps = bulkSend.Install (csmaNodes.Get (1)); 
     tcpSourceApps.Start (Seconds (3.0));
     tcpSourceApps.Stop (Seconds (10.0));
 
@@ -171,12 +166,10 @@ int main (int argc, char *argv[]) {
     //                  METRICAS 
     // ==========================================
 
-    // Wireshark
     pointToPoint.EnablePcapAll ("pcap-backbone");
-    csma.EnablePcap ("pcap-lan", csmaDevices.Get (1), true); // Grampeia o Servidor de Acervo
-    phy.EnablePcap ("pcap-wifi", staDevices.Get (0));        // Grampeia o Aluno que faz download
+    csma.EnablePcap ("pcap-lan", csmaDevices.Get (1), true); 
+    phy.EnablePcap ("pcap-wifi", staDevices.Get (0));        
 
-    // FlowMonitor para estatisticas
     FlowMonitorHelper flowmon;
     Ptr<FlowMonitor> monitor = flowmon.InstallAll ();
 
@@ -198,6 +191,7 @@ int main (int argc, char *argv[]) {
         std::string name = (i == 0) ? "Aluno_Download" : "Aluno_Ouvinte_" + std::to_string(i);
         anim.UpdateNodeDescription (wifiStaNodes.Get (i)->GetId (), name);
     }
+    
     // ==========================================
     //                 SIMULACAO
     // ==========================================
@@ -205,7 +199,6 @@ int main (int argc, char *argv[]) {
     Simulator::Stop (Seconds (10.0));
     Simulator::Run ();
 
-    // Exporta as metricas do FlowMonitor para um XML antes de destruir o simulador
     monitor->SerializeToXmlFile ("biblioteca-estatisticas.xml", true, true);
 
     Simulator::Destroy ();

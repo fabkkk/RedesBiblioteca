@@ -167,22 +167,22 @@ int main (int argc, char *argv[]) {
     
     // adiciona rotulos e CORES aos nos principais para facilitar a identificacao na animacao
     anim.UpdateNodeDescription (0, "Roteador_Central");
-    anim.UpdateNodeColor (0, 255, 0, 0); // Vermelho
+    anim.UpdateNodeColor (0, 255, 0, 0); // vermelho
 
     anim.UpdateNodeDescription (1, "Access_Point");
-    anim.UpdateNodeColor (1, 0, 200, 255); // Ciano
+    anim.UpdateNodeColor (1, 0, 200, 255); // ciano
 
     anim.UpdateNodeDescription (2, "Serv_Acervo(TCP)");
-    anim.UpdateNodeColor (2, 150, 0, 220); // Roxo
+    anim.UpdateNodeColor (2, 150, 0, 220); // roxo
 
     anim.UpdateNodeDescription (3, "Serv_Emprest(UDP)");
-    anim.UpdateNodeColor (3, 150, 0, 220); // Roxo
+    anim.UpdateNodeColor (3, 150, 0, 220); // roxo
 
     anim.UpdateNodeDescription (4, "Balcao_1");
-    anim.UpdateNodeColor (4, 255, 140, 0); // Laranja
+    anim.UpdateNodeColor (4, 255, 140, 0); // laranja
 
     anim.UpdateNodeDescription (5, "Balcao_2");
-    anim.UpdateNodeColor (5, 255, 140, 0); // Laranja
+    anim.UpdateNodeColor (5, 255, 140, 0); // laranja
     
     // nomeia e colore cada aluno no wifi para diferenciar quem faz download dos demais
     for (uint32_t i = 0; i < wifiStaNodes.GetN (); ++i) {

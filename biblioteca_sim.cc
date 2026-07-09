@@ -165,18 +165,31 @@ int main (int argc, char *argv[]) {
     AnimationInterface anim ("biblioteca-animacao.xml");
     anim.SetMaxPktsPerTraceFile (99999999); 
     
-    // adiciona rotulos aos nos principais para facilitar a identificacao na animacao
+    // adiciona rotulos e CORES aos nos principais para facilitar a identificacao na animacao
     anim.UpdateNodeDescription (0, "Roteador_Central");
+    anim.UpdateNodeColor (0, 255, 0, 0); // Vermelho
+
     anim.UpdateNodeDescription (1, "Access_Point");
+    anim.UpdateNodeColor (1, 0, 200, 255); // Ciano
+
     anim.UpdateNodeDescription (2, "Serv_Acervo(TCP)");
+    anim.UpdateNodeColor (2, 150, 0, 220); // Roxo
+
     anim.UpdateNodeDescription (3, "Serv_Emprest(UDP)");
+    anim.UpdateNodeColor (3, 150, 0, 220); // Roxo
+
     anim.UpdateNodeDescription (4, "Balcao_1");
+    anim.UpdateNodeColor (4, 255, 140, 0); // Laranja
+
     anim.UpdateNodeDescription (5, "Balcao_2");
+    anim.UpdateNodeColor (5, 255, 140, 0); // Laranja
     
-    // nomeia cada aluno no wifi para diferenciar quem faz download dos demais
+    // nomeia e colore cada aluno no wifi para diferenciar quem faz download dos demais
     for (uint32_t i = 0; i < wifiStaNodes.GetN (); ++i) {
         std::string name = (i == 0) ? "Aluno_Download" : "Aluno_Ouvinte_" + std::to_string(i);
-        anim.UpdateNodeDescription (wifiStaNodes.Get (i)->GetId (), name);
+        uint32_t nodeId = wifiStaNodes.Get(i)->GetId();
+        anim.UpdateNodeDescription (nodeId, name);
+        anim.UpdateNodeColor (nodeId, 0, 70, 255); // Azul
     }
     
     // define o tempo total da simulacao para dez segundos e inicia a execucao
